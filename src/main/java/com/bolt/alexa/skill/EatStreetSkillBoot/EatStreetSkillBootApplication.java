@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.amazon.speech.speechlet.servlet.SpeechletServlet;
+import com.bolt.alexa.skill.service.EatStreetSpeechlet;
 
 @SpringBootApplication
 @ComponentScan(basePackages="com.bolt.alexa.skill")

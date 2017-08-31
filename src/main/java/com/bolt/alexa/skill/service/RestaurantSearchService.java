@@ -2,6 +2,7 @@ package com.bolt.alexa.skill.service;
 
 import java.net.URI;
 
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,13 @@ public class RestaurantSearchService {
 			    .build()
 			    .encode()
 			    .toUri();
+		//log.info("Will Check:>   "+targetUrl.toString());
 		response=restTemplate.getForObject(targetUrl, SearchResponse.class);
 		for(Restaurant r :response.getRestaurants()){
 			if(similar(trimLocation(r.getName()),restaurantName)){
-				log.info(r.getName());
+				//log.info(r.getName()+"same as "+restaurantName);
+				//log.info(r.toString());
+				return r;
 			}
 		}	
 	    log.info("after CLR");
@@ -63,14 +67,13 @@ public class RestaurantSearchService {
 		return null;
 	}
 
-	private boolean similar(Object trimLocation, String restaurantName) {
-		
-		return false;
+	private boolean similar(String trimLocation, String restaurantName) {
+		LevenshteinDistance t=new LevenshteinDistance(4);
+		return t.apply(trimLocation,restaurantName)!=-1;
 	}
 
-	private Object trimLocation(String name) {
-		
-		return null;
+	private String trimLocation(String name) {
+		return name.replaceAll(" - .+", "");
 	}
 
 }
