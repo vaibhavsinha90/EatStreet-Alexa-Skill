@@ -3,7 +3,7 @@ package com.bolt.alexa.skill.model;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Address {
+public class ESAddress {
 	String apiKey;
 	String streetAddress;
 	String city;
@@ -15,11 +15,11 @@ public class Address {
 	
 	@Override
 	public String toString() {
-		return "Address [apiKey=" + apiKey + ", streetAddress=" + streetAddress + ", city=" + city + ", state=" + state
+		return "ESAddress [apiKey=" + apiKey + ", streetAddress=" + streetAddress + ", city=" + city + ", state=" + state
 				+ ", zip=" + zip + ", aptNumber=" + aptNumber + ", latitude=" + latitude + ", longitude=" + longitude
 				+ "]";
 	}
-	public Address(){
+	public ESAddress(){
 		
 	}
 	public String getApiKey() {

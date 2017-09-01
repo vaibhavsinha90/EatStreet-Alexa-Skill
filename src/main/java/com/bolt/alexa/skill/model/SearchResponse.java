@@ -6,13 +6,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SearchResponse{
-		private Address address;
+		private ESAddress eSAddress;
 		private Restaurant restaurants[];
-		public Address getAddress() {
-			return address;
+		public ESAddress getAddress() {
+			return eSAddress;
 		}
-		public void setAddress(Address address) {
-			this.address = address;
+		public void setAddress(ESAddress eSAddress) {
+			this.eSAddress = eSAddress;
 		}
 		public Restaurant[] getRestaurants() {
 			return restaurants;
@@ -22,6 +22,6 @@ public class SearchResponse{
 		}
 		@Override
 		public String toString() {
-			return "SearchResponse [address=" + address + ", restaurants=" + Arrays.toString(restaurants) + "]";
+			return "SearchResponse [eSAddress=" + eSAddress + ", restaurants=" + Arrays.toString(restaurants) + "]";
 		}
 	}

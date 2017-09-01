@@ -14,19 +14,7 @@ import com.bolt.alexa.skill.service.EatStreetSpeechlet;
 @SpringBootApplication
 @ComponentScan(basePackages="com.bolt.alexa.skill")
 public class EatStreetSkillBootApplication extends SpringBootServletInitializer{
-	/*
-	@Autowired
-    private HelloWorldSpeechlet mySpeechlet;
-
-    @Bean
-    public ServletRegistrationBean registerServlet() {
-
-        SpeechletServlet speechletServlet = new SpeechletServlet();
-        speechletServlet.setSpeechlet(mySpeechlet);
-
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(speechletServlet, "/hello");
-        return servletRegistrationBean;     
-    }*/
+	
     @Autowired
     private EatStreetSpeechlet eatStreetSpeechlet;
 

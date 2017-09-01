@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 //@JsonIgnoreProperties(ignoreUnknown = true)
@@ -155,6 +154,4 @@ public class Restaurant {
 	public void setZones(DeliveryZone[] zones) {
 		this.zones = zones;
 	}
-	
-	
 }
