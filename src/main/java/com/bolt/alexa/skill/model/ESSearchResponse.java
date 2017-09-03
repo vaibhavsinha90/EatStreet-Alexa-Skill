@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SearchResponse{
+public class ESSearchResponse{
 		private ESAddress eSAddress;
 		private Restaurant restaurants[];
 		public ESAddress getAddress() {
@@ -22,6 +22,6 @@ public class SearchResponse{
 		}
 		@Override
 		public String toString() {
-			return "SearchResponse [eSAddress=" + eSAddress + ", restaurants=" + Arrays.toString(restaurants) + "]";
+			return "ESSearchResponse [eSAddress=" + eSAddress + ", restaurants=" + Arrays.toString(restaurants) + "]";
 		}
 	}

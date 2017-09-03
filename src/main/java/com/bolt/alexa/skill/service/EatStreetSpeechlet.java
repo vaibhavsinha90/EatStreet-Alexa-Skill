@@ -3,15 +3,11 @@ package com.bolt.alexa.skill.service;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.amazon.speech.Sdk;
 import com.amazon.speech.json.SpeechletRequestEnvelope;
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.slu.Slot;
@@ -25,7 +21,6 @@ import com.amazon.speech.speechlet.SpeechletResponse;
 import com.amazon.speech.speechlet.SpeechletV2;
 import com.amazon.speech.speechlet.interfaces.system.SystemInterface;
 import com.amazon.speech.speechlet.interfaces.system.SystemState;
-import com.amazon.speech.speechlet.verifier.TimestampSpeechletRequestVerifier;
 import com.amazon.speech.ui.AskForPermissionsConsentCard;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.Reprompt;
@@ -33,6 +28,7 @@ import com.amazon.speech.ui.SimpleCard;
 import com.bolt.alexa.skill.Amazonmodel.Address;
 import com.bolt.alexa.skill.exception.DeviceAddressClientException;
 import com.bolt.alexa.skill.exception.UnauthorizedException;
+import com.bolt.alexa.skill.model.RestaurantSearchResponse;
 import com.bolt.alexa.skill.model.Restaurant;
 
 @Service
@@ -42,7 +38,12 @@ public class EatStreetSpeechlet implements SpeechletV2 {
     private static final String ALL_ADDRESS_PERMISSION = "read::alexa:device:all:address";
     private static final String ERROR_TEXT="There was an error with the skill. Please try again.";
     private static final String CARD_TITLE="EatStreet.com says...";
-    private static final String HELP_TEXT="Hi, you can ask about restaurants on EatStreet.com";
+    private static final String SKILL_NAME="Get fed on EatStreet";
+    private static final String HELP_TEXT="You can ask if a EatStreet partner restaurant near you, is open, or whether it will deliver to you."
+    		+ " If a restaurant would deliver to you, the skill will tell you the associated minimum order value and delivery charges."
+    		+ " If the requested restaurant is not found by the skill, it may provide a few alternatives."
+    		//+ " For a restaurant named Sam's Cafe, ask, Will Sam's Cafe deliver?"
+    		+ " Try asking a question now.";
     private static final String INVALID_INTENT_TEXT="This is unsupported. Please ask something else.";
     private static final String WELCOME_TEXT="Hi, ask me about a restaurant.";
     
@@ -63,7 +64,7 @@ public class EatStreetSpeechlet implements SpeechletV2 {
         Session session = speechletRequestEnvelope.getSession();
         log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId());
-        return getAskResponse("Welcome to the Echo on EatStreet skill!",WELCOME_TEXT);
+        return getAskResponse("Welcome to the "+SKILL_NAME+" skill!",WELCOME_TEXT);
     }
 
     @Override
@@ -84,7 +85,6 @@ public class EatStreetSpeechlet implements SpeechletV2 {
 	        	log.info("user here: "+session.getUser().toString());
 	        	log.info("userID here: "+session.getUser().getUserId().toString());
 	        	log.info("user perms here: "+session.getUser().getPermissions().toString());*/
-	        	
 	        	String consentToken = session.getUser().getPermissions().getConsentToken();
                 if (consentToken == null) {
                     log.info("The user hasn't authorized the skill. Sending a permissions card.");
@@ -118,7 +118,6 @@ public class EatStreetSpeechlet implements SpeechletV2 {
 	        case "AMAZON.StopIntent":
 	        case "AMAZON.CancelIntent":
 	        	return getTellResponse("");
-	        	//getAskResponse("You can ask if a restaurant is open/will deliver to your house.", HELP_TEXT);
 	        default:
 	        	return getAskResponse("You can ask if a restaurant is open/will deliver to your house.",INVALID_INTENT_TEXT);
         }
@@ -141,30 +140,46 @@ public class EatStreetSpeechlet implements SpeechletV2 {
         //	showText+=e.getKey()+" : "+e.getValue().getName()+" : "+e.getValue().getValue();
     	boolean checkDelivery=!intent.getName().equals("IsOpen");
     	String deviceAddressText=deviceAddress.getTextAdddress();
+    	String findRestaurant=intentSlots.get("restaurant").getValue();
     	log.info("Device Address= "+deviceAddressText+"will check eatstreet now");
-        Restaurant matchedRestaurant=restaurantSearchService.search(intentSlots.get("restaurant").getValue(),deviceAddressText,defaultRadius,checkDelivery);
-        if(matchedRestaurant==null)
-        	showText= "Restaurant not found";	
-        else if(matchedRestaurant.isOpen()){
-        	if(checkDelivery){
-        		if(matchedRestaurant.isOffersDelivery()){
-        			StringBuilder temp_sb=new StringBuilder();
-        			temp_sb.append(matchedRestaurant.getName()+" will deliver to your location");
-        			if(matchedRestaurant.getDeliveryMin()!=null)
-        				temp_sb.append(" on a minimum order of "+matchedRestaurant.getDeliveryMin());
-        			if(matchedRestaurant.getDeliveryMin()!=null)
-        				temp_sb.append(" . Delivery charge is "+matchedRestaurant.getDeliveryPrice());
-        			showText=temp_sb.toString()+".";
-        		}
-        			
-        		else
-        			showText=matchedRestaurant.getName()+" is open but does not deliver to your location.";
+        RestaurantSearchResponse response=restaurantSearchService.search(findRestaurant,deviceAddressText,defaultRadius,checkDelivery);
+        Restaurant[] foundRestaurants=response.getFoundRestaurants();
+        if(!response.isFoundMatch()){
+        	showText="Sorry, "+findRestaurant+" was not found near you on EatStreet.com.";
+        	if(foundRestaurants.length==0)
+        		showText+=" Currently, EatStreet does not partner with any restaurants near you.";
+        	else if(foundRestaurants.length==1)
+        		showText+=" Another restaurant I found is "+foundRestaurants[0].getName();
+        	else{
+        		showText+=" Some other restaurants I found are - ";
+        		int i=0;
+            	for(;i<foundRestaurants.length-2;i++)
+            		showText+=foundRestaurants[i].getName()+", ";
+            	showText+=foundRestaurants[i].getName()+", and "+foundRestaurants[i+1].getName();
         	}
-        	else
-        		showText=matchedRestaurant.getName()+" is open right now.";
+        }	
+        else{
+        	Restaurant matchedRestaurant=foundRestaurants[0];
+        	if(matchedRestaurant.isOpen()){
+            	if(checkDelivery){
+            		if(matchedRestaurant.isOffersDelivery()){
+            			StringBuilder temp_sb=new StringBuilder();
+            			temp_sb.append(matchedRestaurant.getName()+" will deliver to your location");
+            			if(matchedRestaurant.getDeliveryMin()!=null)
+            				temp_sb.append(" on a minimum order of "+matchedRestaurant.getDeliveryMin());
+            			if(matchedRestaurant.getDeliveryMin()!=null)
+            				temp_sb.append(" . Delivery charge is "+matchedRestaurant.getDeliveryPrice());
+            			showText=temp_sb.toString()+".";
+            		}	
+            		else
+            			showText=matchedRestaurant.getName()+" is open but does not deliver to your location.";
+            	}
+            	else
+            		showText=matchedRestaurant.getName()+" is open right now.";
+            }
+            else
+            	showText="Sorry, "+matchedRestaurant.getName()+" is closed right now.";
         }
-        else
-        	showText="Sorry, "+matchedRestaurant.getName()+" is closed right now.";
         
         SimpleCard card = new SimpleCard();
         card.setTitle(CARD_TITLE);
@@ -201,7 +216,7 @@ public class EatStreetSpeechlet implements SpeechletV2 {
             "Please give this skill permissions to access your address.";
 
         AskForPermissionsConsentCard card = new AskForPermissionsConsentCard();
-        card.setTitle("EatStreet Skill needs your address");
+        card.setTitle("The "+SKILL_NAME+" skill needs your address");
 
         Set<String> permissions = new HashSet<>();
         permissions.add(ALL_ADDRESS_PERMISSION);
@@ -215,25 +230,4 @@ public class EatStreetSpeechlet implements SpeechletV2 {
     private SystemState getSystemState(Context context) {
         return context.getState(SystemInterface.class, SystemState.class);
     }
-    
-    /*
-    private TimestampSpeechletRequestVerifier getTimetampVerifier() {
-        String timestampToleranceAsString =
-                System.getProperty(Sdk.TIMESTAMP_TOLERANCE_SYSTEM_PROPERTY);
- 
-        if (timestampToleranceAsString==null ||timestampToleranceAsString.length()==0) {
-            try {
-                long timestampTolerance = Long.parseLong(timestampToleranceAsString);
-                return new TimestampSpeechletRequestVerifier(timestampTolerance, TimeUnit.SECONDS);
-            } catch (NumberFormatException ex) {
-                log.warn("The configured timestamp tolerance {} is invalid, "
-                        + "disabling timestamp verification", timestampToleranceAsString);
-            }
-        } else {
-            log.warn("No timestamp tolerance has been configured, "
-                    + "disabling timestamp verification");
-        }
- 
-        return null;
-    }*/
 }

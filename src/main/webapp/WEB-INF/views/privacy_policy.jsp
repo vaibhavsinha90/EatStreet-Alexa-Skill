@@ -1,22 +1,42 @@
 <html>
 <head>
-<title>Yahoo!!</title>
+<title>Get Fed on EatStreet - boltApps</title>
 </head>
 <body>
-Welcome User!<br /> 
+<div>
+<h1><u>Privacy policy for 'Get Fed on EatStreet' Alexa Skill</u></h1>
+<p>This privacy policy applies solely to information collected by the 'Get Fed on EatStreet' Alexa skill. </p>
 
-This privacy policy describes how this skill uses and protect your personal information.<br /> <br /> 
+<p>It will notify you of the following: </p>
 
-Security:<br /> 
+<ol><li value="1">
+	<p>What personally identifiable information is collected from you through the 'Get Fed on EatStreet' Alexa Skill, how it is used and with whom it may be shared. <br />
+	 </p>
+	</li>
+	<li value="2">
+	<p>What choices are available to you regarding the use of your data. <br />
+	 </p>
+	</li>
+	<li value="3">
+	<p>The security procedures in place to protect the misuse of your information. <br />
+	 </p>
+	</li>
+</ol>
+<h2>Information Collection, Use, and Sharing</h2>
 
-The skill uses standard encryptions to protect all data being sent and received (SSL/TLS).<br /> <br /> 
+<p>The developer is the sole owner of the information collected by this skill. The skill only accesses your device's address, as voluntarily entered by you on the Alexa app. This happens every time you use the skill and this information is never stored on our systems. We will not sell or rent this information to anyone. </p>
 
-Information we collect:<br /> 
+<p>The skill uses this information to respond to you, and fulfill its core functionality. We will not share your information with any third party, other than as necessary to fulfill your request, e.g. to check EatStreet.com. </p>
 
-The skill only accesses your amazon device's address as entered by you on the Alexa app. This happens everytime you use the skill and the address is never stored on our systems.<br /> <br /> 
+<h2>Your Access to and Control Over Information </h2>
 
-Information Sharing:<br /> 
+<p>You may stop any access of your information by us at any time by disabling the Alexa skill from all of your devices.</p>
 
-We will not share your device address with third parties for their own use.
+<h2>Security</h2>
+
+<p>We take precautions to protect your information. When you submit sensitive information via the Alexa skill, your information is protected. 
+We use encryption to protect sensitive information transmitted online.</p>
+
+</div>
 </body>
 </html>
