@@ -25,7 +25,7 @@ public class RestaurantSearchService {
 	private static final Integer SIMILARITY_THRESHOLD = 4;
 	private static final Integer SAMPLE_RESTAURANT_COUNT = 3;
 	private static String url="https://api.eatstreet.com";
-	private static String accessToken="c5f5a4f0efbb2a10";
+	private static String accessToken="ENTER_KEY_HERE";
 	private static Logger log = LoggerFactory.getLogger(RestaurantSearchService.class);
 	private String method;
 	@Autowired
