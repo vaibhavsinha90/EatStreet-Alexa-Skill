@@ -36,18 +36,16 @@ public class RestaurantSearchService {
 	public RestTemplate restTemplate(RestTemplateBuilder builder) {
 		return builder.build();
 	}
-<<<<<<< HEAD
+
 	public RestaurantSearchResponse search(String restaurantName, String foodType, String address,String pickupRadius,boolean checkDelivery) {
-=======
-	public RestaurantSearchResponse search(String restaurantName,String address,String pickupRadius,boolean checkDelivery) {
->>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
+
 		if(checkDelivery)
 			method="delivery";
 		else
 			method="both";		
 		
 		log.info("Will search restaurant now...");
-<<<<<<< HEAD
+
 		MultiValueMap<String, String> vars=new LinkedMultiValueMap<String, String>();
 		vars.add("access-token",accessToken);
 		vars.add("method",method);
@@ -56,14 +54,6 @@ public class RestaurantSearchService {
 		if(foodType!=null)
 			vars.add("search",foodType);
 		URI targetUrl=UriComponentsBuilder.fromUriString(url)
-=======
-		MultiValueMap<String, String> vars = new LinkedMultiValueMap<String, String>();
-		vars.add("access-token", accessToken);
-		vars.add("method", method);
-		vars.add("street-address", address);
-		vars.add("pickup-radius",pickupRadius);
-		URI targetUrl= UriComponentsBuilder.fromUriString(url)
->>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
 			    .path("/publicapi/v1/restaurant/search/")
 			    .queryParams(vars)
 			    .build()
@@ -73,7 +63,6 @@ public class RestaurantSearchService {
 		
 		try {
 			response=restTemplate.getForObject(targetUrl, ESSearchResponse.class);
-<<<<<<< HEAD
 			if(foodType!=null){
 				if(response.getRestaurants().length>0){
 					Collections.shuffle(Arrays.asList(response.getRestaurants()));
@@ -92,16 +81,6 @@ public class RestaurantSearchService {
 				Collections.shuffle(Arrays.asList(response.getRestaurants()));
 				return new RestaurantSearchResponse(false,Arrays.copyOf(response.getRestaurants(),Math.min(SAMPLE_RESTAURANT_COUNT,response.getRestaurants().length)));
 			}
-=======
-			for(Restaurant r :response.getRestaurants()){
-				if(similar(trimLocation(r.getName()),restaurantName)){
-					log.info("Restaurant found!");
-					return new RestaurantSearchResponse(true,new Restaurant[]{r});
-				}
-			}
-			Collections.shuffle(Arrays.asList(response.getRestaurants()));
-			return new RestaurantSearchResponse(false,Arrays.copyOf(response.getRestaurants(),Math.min(SAMPLE_RESTAURANT_COUNT,response.getRestaurants().length)));
->>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
 		}
 		catch(Exception e){
 			log.info("Call to EatStreet API failed!");
