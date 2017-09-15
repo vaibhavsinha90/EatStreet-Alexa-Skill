@@ -17,24 +17,23 @@ package com.bolt.alexa.skill.exception;
 import com.bolt.alexa.skill.service.AlexaDeviceAddressClient;
 
 /**
- * This is an exception thrown from the {@link AlexaDeviceAddressClient} that indicates that a failure occurred.
+ * This is an exception thrown from the {@link AlexaDeviceAddressClient} that
+ * indicates that a failure occurred.
  */
 public class DeviceAddressClientException extends Exception {
 
-
-    private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = 1L;
 
 	public DeviceAddressClientException(String message, Exception e) {
-        super(message, e);
-    }
+		super(message, e);
+	}
 
-    public DeviceAddressClientException(String message) {
-        super(message);
-    }
+	public DeviceAddressClientException(String message) {
+		super(message);
+	}
 
-    public DeviceAddressClientException(Exception e) {
-        super(e);
-    }
+	public DeviceAddressClientException(Exception e) {
+		super(e);
+	}
 
 }

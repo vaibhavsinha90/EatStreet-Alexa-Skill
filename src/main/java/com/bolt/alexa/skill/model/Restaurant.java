@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 //@JsonIgnoreProperties(ignoreUnknown = true)
 @Component

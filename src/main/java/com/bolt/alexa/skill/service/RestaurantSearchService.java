@@ -24,73 +24,70 @@ import com.bolt.alexa.skill.model.RestaurantSearchResponse;
 public class RestaurantSearchService {
 	private static final Integer SIMILARITY_THRESHOLD = 4;
 	private static final Integer SAMPLE_RESTAURANT_COUNT = 3;
-	private static String url="https://api.eatstreet.com";
-	private static String accessToken="ENTER_KEY_HERE";
+	private static String url = "https://api.eatstreet.com";
+	private static String accessToken = "ENTER_KEY_HERE";
 	private static Logger log = LoggerFactory.getLogger(RestaurantSearchService.class);
 	private String method;
 	@Autowired
 	ESSearchResponse response;
 	@Autowired
 	RestTemplate restTemplate;
+
 	@Bean
 	public RestTemplate restTemplate(RestTemplateBuilder builder) {
 		return builder.build();
 	}
 
-	public RestaurantSearchResponse search(String restaurantName, String foodType, String address,String pickupRadius,boolean checkDelivery) {
+	public RestaurantSearchResponse search(String restaurantName, String foodType, String address, String pickupRadius,
+			boolean checkDelivery) {
 
-		if(checkDelivery)
-			method="delivery";
+		if (checkDelivery)
+			method = "delivery";
 		else
-			method="both";		
-		
+			method = "both";
+
 		log.info("Will search restaurant now...");
 
-		MultiValueMap<String, String> vars=new LinkedMultiValueMap<String, String>();
-		vars.add("access-token",accessToken);
-		vars.add("method",method);
-		vars.add("street-address",address);
-		vars.add("pickup-radius",pickupRadius);
-		if(foodType!=null)
-			vars.add("search",foodType);
-		URI targetUrl=UriComponentsBuilder.fromUriString(url)
-			    .path("/publicapi/v1/restaurant/search/")
-			    .queryParams(vars)
-			    .build()
-			    .encode()
-			    .toUri();
-		//log.info("Will check URL:   "+targetUrl.toString());
-		
+		MultiValueMap<String, String> vars = new LinkedMultiValueMap<String, String>();
+		vars.add("access-token", accessToken);
+		vars.add("method", method);
+		vars.add("street-address", address);
+		vars.add("pickup-radius", pickupRadius);
+		if (foodType != null)
+			vars.add("search", foodType);
+		URI targetUrl = UriComponentsBuilder.fromUriString(url).path("/publicapi/v1/restaurant/search/")
+				.queryParams(vars).build().encode().toUri();
+		// log.info("Will check URL: "+targetUrl.toString());
+
 		try {
-			response=restTemplate.getForObject(targetUrl, ESSearchResponse.class);
-			if(foodType!=null){
-				if(response.getRestaurants().length>0){
+			response = restTemplate.getForObject(targetUrl, ESSearchResponse.class);
+			if (foodType != null) {
+				if (response.getRestaurants().length > 0) {
 					Collections.shuffle(Arrays.asList(response.getRestaurants()));
-					return new RestaurantSearchResponse(true,Arrays.copyOf(response.getRestaurants(),Math.min(SAMPLE_RESTAURANT_COUNT,response.getRestaurants().length)));
-				}
-				else
-					return new RestaurantSearchResponse(false,null);
-			}
-			else{
-				for(Restaurant r :response.getRestaurants()){
-					if(similar(trimLocation(r.getName()),restaurantName)){
+					return new RestaurantSearchResponse(true, Arrays.copyOf(response.getRestaurants(),
+							Math.min(SAMPLE_RESTAURANT_COUNT, response.getRestaurants().length)));
+				} else
+					return new RestaurantSearchResponse(false, null);
+			} else {
+				for (Restaurant r : response.getRestaurants()) {
+					if (similar(trimLocation(r.getName()), restaurantName)) {
 						log.info("Restaurant found!");
-						return new RestaurantSearchResponse(true,new Restaurant[]{r});
+						return new RestaurantSearchResponse(true, new Restaurant[] { r });
 					}
 				}
 				Collections.shuffle(Arrays.asList(response.getRestaurants()));
-				return new RestaurantSearchResponse(false,Arrays.copyOf(response.getRestaurants(),Math.min(SAMPLE_RESTAURANT_COUNT,response.getRestaurants().length)));
+				return new RestaurantSearchResponse(false, Arrays.copyOf(response.getRestaurants(),
+						Math.min(SAMPLE_RESTAURANT_COUNT, response.getRestaurants().length)));
 			}
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			log.info("Call to EatStreet API failed!");
 		}
 		return null;
 	}
 
 	private boolean similar(String trimLocation, String restaurantName) {
-		LevenshteinDistance t=new LevenshteinDistance(SIMILARITY_THRESHOLD);
-		return t.apply(trimLocation,restaurantName)!=-1;
+		LevenshteinDistance t = new LevenshteinDistance(SIMILARITY_THRESHOLD);
+		return t.apply(trimLocation, restaurantName) != -1;
 	}
 
 	private String trimLocation(String name) {

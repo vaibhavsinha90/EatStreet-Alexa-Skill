@@ -12,23 +12,22 @@ import com.amazon.speech.speechlet.servlet.SpeechletServlet;
 import com.bolt.alexa.skill.service.EatStreetSpeechlet;
 
 @SpringBootApplication
-@ComponentScan(basePackages="com.bolt.alexa.skill")
-public class EatStreetSkillBootApplication extends SpringBootServletInitializer{
-	
-    @Autowired
-    private EatStreetSpeechlet eatStreetSpeechlet;
+@ComponentScan(basePackages = "com.bolt.alexa.skill")
+public class EatStreetSkillBootApplication extends SpringBootServletInitializer {
 
-    @Bean
-    public ServletRegistrationBean registerServlet() {
+	@Autowired
+	private EatStreetSpeechlet eatStreetSpeechlet;
 
-        SpeechletServlet speechletServlet = new SpeechletServlet();
-        speechletServlet.setSpeechlet(eatStreetSpeechlet);
+	@Bean
+	public ServletRegistrationBean registerServlet() {
 
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(speechletServlet, "/eat");
-        return servletRegistrationBean;     
-    }
-    
-    
+		SpeechletServlet speechletServlet = new SpeechletServlet();
+		speechletServlet.setSpeechlet(eatStreetSpeechlet);
+
+		ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(speechletServlet, "/eat");
+		return servletRegistrationBean;
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(EatStreetSkillBootApplication.class, args);
 	}

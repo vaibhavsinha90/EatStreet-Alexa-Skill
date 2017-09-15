@@ -14,20 +14,21 @@
 
 package com.bolt.alexa.skill.exception;
 
-
 /**
- * This exception indicates that the AlexaDeviceAddressClient failed because of a permission specific
- * reason.
+ * This exception indicates that the AlexaDeviceAddressClient failed because of
+ * a permission specific reason.
  *
- * Refer to {@link DeviceAddressSpeechlet} to see how permission related errors are handled.
+ * Refer to {@link DeviceAddressSpeechlet} to see how permission related errors
+ * are handled.
  */
 public class UnauthorizedException extends DeviceAddressClientException {
 	private static final long serialVersionUID = 2L;
-    public UnauthorizedException(String message, Exception e) {
-        super(message, e);
-    }
 
-    public UnauthorizedException(String message) {
-        super(message);
-    }
+	public UnauthorizedException(String message, Exception e) {
+		super(message, e);
+	}
+
+	public UnauthorizedException(String message) {
+		super(message);
+	}
 }
