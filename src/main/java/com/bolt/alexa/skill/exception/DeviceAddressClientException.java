@@ -21,7 +21,14 @@ import com.bolt.alexa.skill.service.AlexaDeviceAddressClient;
  */
 public class DeviceAddressClientException extends Exception {
 
+<<<<<<< HEAD
     private static final long serialVersionUID = 1L;
+=======
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+>>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
 
 	public DeviceAddressClientException(String message, Exception e) {
         super(message, e);

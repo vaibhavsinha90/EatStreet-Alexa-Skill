@@ -39,6 +39,7 @@ public class EatStreetSpeechlet implements SpeechletV2 {
     private static final String ERROR_TEXT="There was an error with the skill. Please try again.";
     private static final String CARD_TITLE="EatStreet.com says...";
     private static final String SKILL_NAME="Get fed on EatStreet";
+<<<<<<< HEAD
     private static final String RePrompt="Ask for help or, try asking another question now.";
     private static final String HELP_TEXT="You can  ask the skill to find an EatStreet partner restaurant near you, based on cuisine or food items."
     		+ " You can also ask if an EatStreet partner restaurant near you, is open, or whether it will deliver to you."
@@ -47,6 +48,15 @@ public class EatStreetSpeechlet implements SpeechletV2 {
     		+ " Try asking a question now.";
     private static final String INVALID_INTENT_TEXT="This is unsupported. Please ask something else.";
     private static final String WELCOME_TEXT="Ask me about a restaurant.";
+=======
+    private static final String HELP_TEXT="You can ask if a EatStreet partner restaurant near you, is open, or whether it will deliver to you."
+    		+ " If a restaurant would deliver to you, the skill will tell you the associated minimum order value and delivery charges."
+    		+ " If the requested restaurant is not found by the skill, it may provide a few alternatives."
+    		//+ " For a restaurant named Sam's Cafe, ask, Will Sam's Cafe deliver?"
+    		+ " Try asking a question now.";
+    private static final String INVALID_INTENT_TEXT="This is unsupported. Please ask something else.";
+    private static final String WELCOME_TEXT="Hi, ask me about a restaurant.";
+>>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
     
     @Autowired
 	private RestaurantSearchService restaurantSearchService;
@@ -82,8 +92,15 @@ public class EatStreetSpeechlet implements SpeechletV2 {
         switch(intentName){
 	        case "WillDeliver":
 	        case "IsOpen":
+<<<<<<< HEAD
 	        case "FindFood":
 	        	
+=======
+	        	/*
+	        	log.info("user here: "+session.getUser().toString());
+	        	log.info("userID here: "+session.getUser().getUserId().toString());
+	        	log.info("user perms here: "+session.getUser().getPermissions().toString());*/
+>>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
 	        	String consentToken = session.getUser().getPermissions().getConsentToken();
                 if (consentToken == null) {
                     log.info("The user hasn't authorized the skill. Sending a permissions card.");
@@ -95,6 +112,10 @@ public class EatStreetSpeechlet implements SpeechletV2 {
 
                         String deviceId = systemState.getDevice().getDeviceId();
                         String apiEndpoint = systemState.getApiEndpoint();
+<<<<<<< HEAD
+=======
+                        //log.info(deviceId+" & "+apiEndpoint);
+>>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
                         AlexaDeviceAddressClient alexaDeviceAddressClient = new AlexaDeviceAddressClient(deviceId, consentToken, apiEndpoint);
 
                         Address deviceAddress = alexaDeviceAddressClient.getFullAddress();
@@ -112,12 +133,20 @@ public class EatStreetSpeechlet implements SpeechletV2 {
                     }
                 }
 	        case "AMAZON.HelpIntent":
+<<<<<<< HEAD
 	        	return getAskResponse("You can find restaurants by cuisine, or ask if a restaurant is open/will deliver to your house.", HELP_TEXT);
+=======
+	        	return getAskResponse("You can ask if a restaurant is open/will deliver to your house.", HELP_TEXT);
+>>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
 	        case "AMAZON.StopIntent":
 	        case "AMAZON.CancelIntent":
 	        	return getTellResponse("");
 	        default:
+<<<<<<< HEAD
 	        	return getAskResponse("You can find restaurants by cuisine, or ask if a restaurant is open/will deliver to your house.",INVALID_INTENT_TEXT);
+=======
+	        	return getAskResponse("You can ask if a restaurant is open/will deliver to your house.",INVALID_INTENT_TEXT);
+>>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
         }
     }   
 
@@ -134,6 +163,7 @@ public class EatStreetSpeechlet implements SpeechletV2 {
     	Map<String, Slot> intentSlots=intent.getSlots();
     	String speechText;
     	String showText;
+<<<<<<< HEAD
         boolean checkDelivery=intent.getName().equals("WillDeliver");
     	String deviceAddressText=deviceAddress.getTextAdddress();
     	
@@ -202,6 +232,51 @@ public class EatStreetSpeechlet implements SpeechletV2 {
 	            else
 	            	showText="Sorry, "+matchedRestaurant.getName()+" is closed right now.";
 	        }
+=======
+        //for(Map.Entry<String, Slot> e:intentSlots.entrySet())
+        //	showText+=e.getKey()+" : "+e.getValue().getName()+" : "+e.getValue().getValue();
+    	boolean checkDelivery=!intent.getName().equals("IsOpen");
+    	String deviceAddressText=deviceAddress.getTextAdddress();
+    	String findRestaurant=intentSlots.get("restaurant").getValue();
+    	log.info("Device Address= "+deviceAddressText+"will check eatstreet now");
+        RestaurantSearchResponse response=restaurantSearchService.search(findRestaurant,deviceAddressText,defaultRadius,checkDelivery);
+        Restaurant[] foundRestaurants=response.getFoundRestaurants();
+        if(!response.isFoundMatch()){
+        	showText="Sorry, "+findRestaurant+" was not found near you on EatStreet.com.";
+        	if(foundRestaurants.length==0)
+        		showText+=" Currently, EatStreet does not partner with any restaurants near you.";
+        	else if(foundRestaurants.length==1)
+        		showText+=" Another restaurant I found is "+foundRestaurants[0].getName();
+        	else{
+        		showText+=" Some other restaurants I found are - ";
+        		int i=0;
+            	for(;i<foundRestaurants.length-2;i++)
+            		showText+=foundRestaurants[i].getName()+", ";
+            	showText+=foundRestaurants[i].getName()+", and "+foundRestaurants[i+1].getName();
+        	}
+        }	
+        else{
+        	Restaurant matchedRestaurant=foundRestaurants[0];
+        	if(matchedRestaurant.isOpen()){
+            	if(checkDelivery){
+            		if(matchedRestaurant.isOffersDelivery()){
+            			StringBuilder temp_sb=new StringBuilder();
+            			temp_sb.append(matchedRestaurant.getName()+" will deliver to your location");
+            			if(matchedRestaurant.getDeliveryMin()!=null)
+            				temp_sb.append(" on a minimum order of "+matchedRestaurant.getDeliveryMin());
+            			if(matchedRestaurant.getDeliveryMin()!=null)
+            				temp_sb.append(" . Delivery charge is "+matchedRestaurant.getDeliveryPrice());
+            			showText=temp_sb.toString()+".";
+            		}	
+            		else
+            			showText=matchedRestaurant.getName()+" is open but does not deliver to your location.";
+            	}
+            	else
+            		showText=matchedRestaurant.getName()+" is open right now.";
+            }
+            else
+            	showText="Sorry, "+matchedRestaurant.getName()+" is closed right now.";
+>>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
         }
         
         SimpleCard card = new SimpleCard();
@@ -250,6 +325,7 @@ public class EatStreetSpeechlet implements SpeechletV2 {
 
         return SpeechletResponse.newTellResponse(speech, card);
     }
+<<<<<<< HEAD
     private String addRestaurantNames(Restaurant[] restaurants){
     	StringBuilder temp_sb=new StringBuilder();
     	int i=0;
@@ -258,6 +334,8 @@ public class EatStreetSpeechlet implements SpeechletV2 {
     	temp_sb.append(restaurants[i].getName()+", and "+restaurants[i+1].getName()+".");
     	return temp_sb.toString();
     }
+=======
+>>>>>>> e0c54fb50a2ce90cff54b36f30ac7f1368d5766b
     private SystemState getSystemState(Context context) {
         return context.getState(SystemInterface.class, SystemState.class);
     }
